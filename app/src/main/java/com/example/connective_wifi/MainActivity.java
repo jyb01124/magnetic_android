@@ -55,33 +55,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @SuppressLint("StaticFieldLeak")
     public void onToggleClicked(View v) {
-        String username = "ybcho";
-        String host = "192.168.0.101";
-        int port = 22;
-        String password = "gagaseoro1@";
-        String Str_ = "==> Connecting to" + host;
 
-        Session session = null;
-        Channel channel = null;
         Button Connect_button = (Button) findViewById(R.id.connect_button);
 
         boolean on = ((ToggleButton) v).isChecked();
-        if(on) {
+        if (on) {
             fail = 0;
-            new AsyncTask<Integer, Void, Void>(){
-                @Override
-                protected Void doInBackground(Integer... params) {
-                    try {
-                        String a = executeRemoteCommand("ybcho", "gagaseoro1@","192.168.0.101", 22);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        fail = 1;
+            try {
+                new AsyncTask<Integer, Void, Integer>() {
+                    @Override
+                    protected Integer doInBackground(Integer... params) {
+                        try {
+                            executeRemoteCommand("ybcho", "gagaseoro1@", "192.168.0.101", 22);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            fail = 1;
+                        }
+                        return fail;
                     }
-                    return null;
-                }
-            }.execute(1);
-            if(fail == 0){
-                Toast.makeText(getApplicationContext(),"serverON",Toast.LENGTH_LONG).show();
+                }.execute(1).get();
+            } catch (Exception f) {
+                f.printStackTrace();
+            }
+            if (fail == 0) {
+                Toast.makeText(getApplicationContext(), "serverON", Toast.LENGTH_LONG).show();
                 Connect_button.setVisibility(View.VISIBLE);
 
                 Connect_button.setOnClickListener(new View.OnClickListener() {
@@ -90,14 +87,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         Toast.makeText(getApplicationContext(), "Connect 버튼이 눌려졌음", Toast.LENGTH_LONG).show();
                     }
                 });
-            }
-            else{
-                Toast.makeText(getApplicationContext(),"Server Error",Toast.LENGTH_LONG).show();
-                Toast.makeText(getApplicationContext(),"Please rebuild",Toast.LENGTH_LONG).show();
-            }
+
+            }else{
+                    Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Please rebuild", Toast.LENGTH_LONG).show();
+                }
 
         } else {
-            Toast.makeText(getApplicationContext(),"unchecked",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "unchecked", Toast.LENGTH_LONG).show();
             Connect_button.setVisibility(View.INVISIBLE);
         }
     }
@@ -118,14 +115,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // SSH Channel
         ChannelExec channelssh = (ChannelExec)
                 session.openChannel("exec");
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         channelssh.setOutputStream(baos);
 
         // Execute command
-        channelssh.setCommand("export DISPLAY=:0");
-        channelssh.setCommand("notify-send '메롱' '메롱'");
-
+        channelssh.setCommand("lsusb > /home/pi/test.txt");
         channelssh.connect();
         channelssh.disconnect();
 
@@ -164,5 +158,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 }
+
+
 
 
